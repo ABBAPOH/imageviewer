@@ -1,15 +1,19 @@
 #include "application.h"
 
-#include <QDataStream>
-#include <QDebug>
-#include <QDesktopServices>
-#include <QDir>
-#include <QFileOpenEvent>
-#include <QSettings>
-#include <QUrl>
+#include <QtCore/QDataStream>
+#include <QtCore/QDebug>
+#include <QtCore/QDir>
+#include <QtCore/QSettings>
+#include <QtCore/QUrl>
+
+#include <QtGui/QDesktopServices>
+#include <QtGui/QFileOpenEvent>
+
+#include <ImageView/ImageViewSettings>
 
 #include "mainwindow.h"
-#include "qimageviewsettings.h"
+
+using namespace ImageViewer;
 
 static const quint32 m_magic = 0x6130396e; // "a09n"
 static const quint8 m_version = 1;
@@ -17,13 +21,13 @@ static const quint8 m_version = 1;
 Application::Application(const QString &id, int &argc, char **argv) :
     QtSingleApplication(id, argc, argv)
 {
-    setApplicationName("QImageViewer");
+    setApplicationName("ImageViewer");
     setOrganizationName("arch");
     connect(this, SIGNAL(messageReceived(QString)), SLOT(handleMessage(QString)));
     connect(this, SIGNAL(aboutToQuit()), SLOT(onAboutToQuit()));
 }
 
-QByteArray Application::saveState() const
+QByteArray Application::saveSession() const
 {
     QByteArray result;
     QDataStream s(&result, QIODevice::WriteOnly);
@@ -38,7 +42,7 @@ QByteArray Application::saveState() const
     return result;
 }
 
-bool Application::restoreState(const QByteArray &arr)
+bool Application::restoreSession(const QByteArray &arr)
 {
     QByteArray state(arr);
     QDataStream s(&state, QIODevice::ReadOnly);
@@ -114,7 +118,7 @@ bool Application::restoreSession()
 
     if (ok) {
         QByteArray state = f.readAll();
-        ok = restoreState(state);
+        ok = restoreSession(state);
         if (!ok)
             qWarning() << tr("Couldn't restore session (located at %1)").arg(filePath);
     }
@@ -149,14 +153,14 @@ void Application::loadSettings()
 {
     QSettings settings;
     settings.beginGroup("Image Viewer");
-    QImageViewSettings *imageSettings = QImageViewSettings::globalSettings();
+    ImageViewSettings *imageSettings = ImageViewSettings::globalSettings();
 
-    int type = settings.value("image background type", QImageViewSettings::None).toInt();
+    int type = settings.value("image background type", ImageViewSettings::None).toInt();
     QColor imageColor = settings.value("image background color", QColor(255, 255, 255)).value<QColor>();
     QColor backgroundColor = settings.value("background color", QColor(128, 128, 128)).value<QColor>();
     bool useOpenGL = settings.value("use OpenGL", false).toBool();
 
-    imageSettings->setiImageBackgroundType(QImageViewSettings::ImageBackgroundType(type));
+    imageSettings->setiImageBackgroundType(ImageViewSettings::ImageBackgroundType(type));
     imageSettings->setImageBackgroundColor(imageColor);
     imageSettings->setBackgroundColor(backgroundColor);
     imageSettings->setUseOpenGL(useOpenGL);
@@ -166,7 +170,7 @@ void Application::saveSettings()
 {
     QSettings settings;
     settings.beginGroup("Image Viewer");
-    QImageViewSettings *imageSettings = QImageViewSettings::globalSettings();
+    ImageViewSettings *imageSettings = ImageViewSettings::globalSettings();
 
     settings.setValue("image background type", (int)imageSettings->imageBackgroundType());
     settings.setValue("image background color", imageSettings->imageBackgroundColor());
@@ -184,5 +188,5 @@ void Application::storeSession()
     if (!f.open(QFile::WriteOnly))
         return;
 
-    f.write(saveState());
+    f.write(saveSession());
 }

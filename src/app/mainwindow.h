@@ -4,7 +4,10 @@
 #include <QMainWindow>
 
 class QActionGroup;
-class QImageView;
+
+namespace ImageViewer {
+
+class ImageView;
 
 class MainWindow : public QMainWindow
 {
@@ -58,7 +61,7 @@ private:
     void updateTitle();
 
 private:
-    QImageView *view;
+    ImageView *view;
     QString m_file;
 
     QMenuBar *m_menuBar;
@@ -82,5 +85,7 @@ private:
     QAction *actionAbout;
     QAction *actionAboutQt;
 };
+
+} // namespace ImageViewer
 
 #endif // MAINWINDOW_H

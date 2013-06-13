@@ -10,16 +10,20 @@
 #include <QMenuBar>
 #include <QToolBar>
 
-#include "qimageview.h"
-#include "qimageresizedialog.h"
-#include "preferenceswidget.h"
-#include "windowsmenu.h"
+#include <ImageView/ImageView>
+#include <ImageView/ResizeDialog>
 
-QSize m_lastSize;
-QList<MainWindow*> m_windows;
+#include <Widgets/WindowsMenu>
+
+#include "preferenceswindow.h"
+
+using namespace ImageViewer;
 
 static const qint32 m_magic = 0x6d303877; // "m08w"
 static const qint8 m_version = 1;
+
+QSize m_lastSize;
+QList<MainWindow*> m_windows;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -85,7 +89,7 @@ bool MainWindow::restoreState(const QByteArray &arr)
         return false;
 
     s >> version;
-    if (version != version)
+    if (version != m_version)
         return false;
 
     s >> windowGeometry;
@@ -113,7 +117,7 @@ void MainWindow::about()
 
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("About"));
-    msgBox.setText(tr("QImageViewer"));
+    msgBox.setText(tr("ImageViewer"));
     msgBox.setInformativeText(tr("(c) Ivan Komissarov\n\ne-mail: ABBAPOH@gmail.com"));
     msgBox.setIconPixmap(pixmap);
     msgBox.exec();
@@ -199,10 +203,10 @@ void MainWindow::saveAs()
 
 void MainWindow::preferences()
 {
-    static QPointer<PreferencesWidget> widget;
+    static QPointer<PreferencesWindow> widget;
 
     if (!widget) {
-        widget = new PreferencesWidget;
+        widget = new PreferencesWindow();
         widget->setAttribute(Qt::WA_DeleteOnClose);
         widget->show();
     } else {
@@ -214,7 +218,7 @@ void MainWindow::preferences()
 
 void MainWindow::resizeImage()
 {
-    QImageResizeDialog d(this);
+    ResizeDialog d(this);
     d.setImageSize(view->image().size());
     if (d.exec()) {
         view->resizeImage(d.imageSize());
@@ -310,12 +314,12 @@ void MainWindow::resizeEvent(QResizeEvent *e)
 
 void MainWindow::setupUi()
 {
-    setWindowTitle(tr("QImageViewer"));
+    setWindowTitle(tr("ImageViewer"));
 #ifndef Q_OS_MAC
     setWindowIcon(QIcon(":/icons/qimageviewer.png"));
 #endif
 
-    view = new QImageView(this);
+    view = new ImageView(this);
     setCentralWidget(view);
 
     setupMenuBar();
@@ -342,14 +346,14 @@ void MainWindow::setupToolBar()
     m_toolBar->setFloatable(false);
     m_toolBar->setMovable(false);
 
-    m_toolBar->addAction(view->action(QImageView::ZoomIn));
-    m_toolBar->addAction(view->action(QImageView::ZoomOut));
+    m_toolBar->addAction(view->action(ImageView::ZoomIn));
+    m_toolBar->addAction(view->action(ImageView::ZoomOut));
     m_toolBar->addSeparator();
-    m_toolBar->addAction(view->action(QImageView::MoveTool));
-    m_toolBar->addAction(view->action(QImageView::SelectionTool));
+    m_toolBar->addAction(view->action(ImageView::MoveTool));
+    m_toolBar->addAction(view->action(ImageView::SelectionTool));
     m_toolBar->addSeparator();
-    m_toolBar->addAction(view->action(QImageView::RotateLeft));
-    m_toolBar->addAction(view->action(QImageView::RotateRight));
+    m_toolBar->addAction(view->action(ImageView::RotateLeft));
+    m_toolBar->addAction(view->action(ImageView::RotateRight));
 
     setUnifiedTitleAndToolBarOnMac(true);
     addToolBar(m_toolBar);
@@ -398,14 +402,14 @@ void MainWindow::setupEditMenu()
 {
     editMenu = new QMenu(this);
 
-    editMenu->addAction(view->action(QImageView::Undo));
-    editMenu->addAction(view->action(QImageView::Redo));
+    editMenu->addAction(view->action(ImageView::Undo));
+    editMenu->addAction(view->action(ImageView::Redo));
     editMenu->addSeparator();
-    editMenu->addAction(view->action(QImageView::Cut));
-    editMenu->addAction(view->action(QImageView::Copy));
+    editMenu->addAction(view->action(ImageView::Cut));
+    editMenu->addAction(view->action(ImageView::Copy));
     editMenu->addSeparator();
-    editMenu->addAction(view->action(QImageView::MoveTool));
-    editMenu->addAction(view->action(QImageView::SelectionTool));
+    editMenu->addAction(view->action(ImageView::MoveTool));
+    editMenu->addAction(view->action(ImageView::SelectionTool));
     editMenu->addSeparator();
 
     actionPreferences = new QAction(this);
@@ -421,10 +425,10 @@ void MainWindow::setupViewMenu()
 {
     viewMenu = new QMenu(this);
 
-    viewMenu->addAction(view->action(QImageView::ZoomIn));
-    viewMenu->addAction(view->action(QImageView::ZoomOut));
-    viewMenu->addAction(view->action(QImageView::FitInView));
-    viewMenu->addAction(view->action(QImageView::NormalSize));
+    viewMenu->addAction(view->action(ImageView::ZoomIn));
+    viewMenu->addAction(view->action(ImageView::ZoomOut));
+    viewMenu->addAction(view->action(ImageView::FitInView));
+    viewMenu->addAction(view->action(ImageView::NormalSize));
 
     m_menuBar->addMenu(viewMenu);
 }
@@ -440,16 +444,16 @@ void MainWindow::setupToolsMenu()
 
     toolsMenu->addSeparator();
 
-    toolsMenu->addAction(view->action(QImageView::RotateLeft));
-    toolsMenu->addAction(view->action(QImageView::RotateRight));
+    toolsMenu->addAction(view->action(ImageView::RotateLeft));
+    toolsMenu->addAction(view->action(ImageView::RotateRight));
 
     toolsMenu->addSeparator();
 
-    toolsMenu->addAction(view->action(QImageView::FlipHorizontally));
-    toolsMenu->addAction(view->action(QImageView::FlipVertically));
+    toolsMenu->addAction(view->action(ImageView::FlipHorizontally));
+    toolsMenu->addAction(view->action(ImageView::FlipVertically));
 
     toolsMenu->addSeparator();
-    toolsMenu->addAction(view->action(QImageView::ResetOriginal));
+    toolsMenu->addAction(view->action(ImageView::ResetOriginal));
 
     m_menuBar->addMenu(toolsMenu);
 }
@@ -516,10 +520,10 @@ void MainWindow::updateTitle()
 
     if (!m_file.isEmpty()) {
         if (modified)
-            setWindowTitle(tr("%1* - QImageViewer").arg(QFileInfo(m_file).baseName()));
+            setWindowTitle(tr("%1* - ImageViewer").arg(QFileInfo(m_file).baseName()));
         else
-            setWindowTitle(tr("%1 - QImageViewer").arg(QFileInfo(m_file).baseName()));
+            setWindowTitle(tr("%1 - ImageViewer").arg(QFileInfo(m_file).baseName()));
     } else {
-        setWindowTitle(tr("QImageViewer"));
+        setWindowTitle(tr("ImageViewer"));
     }
 }

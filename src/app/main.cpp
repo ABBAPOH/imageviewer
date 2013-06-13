@@ -7,6 +7,8 @@
 #include "application.h"
 #include "mainwindow.h"
 
+using namespace ImageViewer;
+
 static QString getRootPath()
 {
     // Figure out root:  Up one from 'bin' or 'MacOs'
@@ -27,6 +29,8 @@ static inline QString getDefaultTranslationsPath()
     result += QLatin1String("Translations");
 #elif defined Q_OS_WIN
     result += QLatin1Char('/');
+    result += QLatin1String("resources");
+    result += QLatin1Char('/');
     result += QLatin1String("translations");
 #elif defined Q_OS_UNIX
     // not Mac UNIXes
@@ -40,9 +44,26 @@ static inline QString getDefaultTranslationsPath()
     return result;
 }
 
+static void loadTranslations()
+{
+    QString translationsPath = getDefaultTranslationsPath();
+    QTranslator *qtTranslator = new QTranslator(qApp);
+    qtTranslator->load("qt_" + QLocale::system().name(),
+                      translationsPath);
+    qApp->installTranslator(qtTranslator);
+
+    QTranslator *libTranslator = new QTranslator(qApp);
+    libTranslator->load("imageviewer_app" + QLocale::system().name(), translationsPath);
+    qApp->installTranslator(libTranslator);
+
+    QTranslator *appTranslator = new QTranslator(qApp);
+    appTranslator->load("imageviewer" + QLocale::system().name(), translationsPath);
+    qApp->installTranslator(appTranslator);
+}
+
 int main(int argc, char *argv[])
 {
-    Application app("QImageViewer", argc, argv);
+    Application app("ImageViewer", argc, argv);
 
     QStringList arguments = app.arguments();
     arguments[0] = QDir::currentPath();
@@ -52,15 +73,7 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    QString translationsPath = getDefaultTranslationsPath();
-    QTranslator qtTranslator;
-    qtTranslator.load("qt_" + QLocale::system().name(),
-                      translationsPath);
-    app.installTranslator(&qtTranslator);
-
-    QTranslator translator;
-    translator.load("qimageviewer_" + QLocale::system().name(), translationsPath);
-    app.installTranslator(&translator);
+    loadTranslations();
 
     app.loadSettings();
     app.restoreSession();

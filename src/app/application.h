@@ -1,8 +1,9 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
-#include <QApplication>
-#include "qtsingleapplication/qtsingleapplication.h"
+#include <qtsingleapplication.h>
+
+namespace ImageViewer {
 
 class Application : public QtSingleApplication
 {
@@ -25,8 +26,10 @@ protected slots:
 protected:
     bool notify(QObject *object, QEvent *event);
 
-    QByteArray saveState() const;
-    bool restoreState(const QByteArray &state);
+    QByteArray saveSession() const;
+    bool restoreSession(const QByteArray &state);
 };
+
+} // namespace ImageViewer
 
 #endif // APPLICATION_H
