@@ -1,11 +1,21 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include <qglobal.h>
+
+#if QT_VERSION >= 0x050000
+#include <QtWidgets/QApplication>
+#else
 #include <qtsingleapplication.h>
+#endif
 
 namespace ImageViewer {
 
+#if QT_VERSION >= 0x050000
+class Application : public QApplication
+#else
 class Application : public QtSingleApplication
+#endif
 {
     Q_OBJECT
 public:

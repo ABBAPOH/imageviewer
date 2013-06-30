@@ -68,10 +68,12 @@ int main(int argc, char *argv[])
     QStringList arguments = app.arguments();
     arguments[0] = QDir::currentPath();
 
+#if QT_VERSION < 0x050000
     if (app.isRunning()) {
         app.sendMessage(arguments.join("\n"));
         return 0;
     }
+#endif
 
     loadTranslations();
 

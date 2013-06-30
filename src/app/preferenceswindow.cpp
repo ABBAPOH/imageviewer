@@ -1,7 +1,12 @@
 #include "preferenceswindow.h"
 
+#if QT_VERSION >= 0x050000
+#include <QtWidgets/QAction>
+#include <QtWidgets/QVBoxLayout>
+#else
 #include <QtGui/QAction>
 #include <QtGui/QVBoxLayout>
+#endif
 
 #include <ImageView/PreferencesWidget>
 

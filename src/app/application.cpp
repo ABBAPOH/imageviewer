@@ -19,7 +19,11 @@ static const quint32 m_magic = 0x6130396e; // "a09n"
 static const quint8 m_version = 1;
 
 Application::Application(const QString &id, int &argc, char **argv) :
+#if QT_VERSION >= 0x050000
+    QApplication(argc, argv)
+#else
     QtSingleApplication(id, argc, argv)
+#endif
 {
     setApplicationName("ImageViewer");
     setOrganizationName("arch");
@@ -108,7 +112,11 @@ void Application::handleArguments(const QStringList &arguments)
 
 bool Application::restoreSession()
 {
+#if QT_VERSION >= 0x050000
+    QString dataPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#else
     QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
     QString filePath = dataPath + QLatin1Char('/') + QLatin1String("session");
 
     QFile f(filePath);
@@ -180,7 +188,11 @@ void Application::saveSettings()
 
 void Application::storeSession()
 {
+#if QT_VERSION >= 0x050000
+    QString dataPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#else
     QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
     QDir().mkpath(dataPath);
     QString filePath = dataPath + QLatin1Char('/') + QLatin1String("session");
     QFile f(filePath);
