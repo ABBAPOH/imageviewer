@@ -1,8 +1,8 @@
 import qbs.base 1.0
+import qbs.FileInfo
 
 Application {
     name : project.app_target
-    consoleApplication: qbs.debugInformation
 
     Depends { name: "cpp" }
     Depends { id: qtcore; name: "Qt.core" }
@@ -32,9 +32,14 @@ Application {
     ]
 
     Group {
-        fileTagsFilter: product.type
+        fileTagsFilter: ["application"]
         qbs.install: true
-        qbs.installDir: project.install_app_path
+        qbs.installDir: {
+            print(bundle.isBundle);
+            return bundle.isBundle
+                        ? FileInfo.joinPaths(install_app_path, FileInfo.path(bundle.executablePath))
+                        : install_app_path
+        }
     }
     Group {
         name: "Image Viewer.icns"
