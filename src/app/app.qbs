@@ -15,10 +15,9 @@ Application {
         "../../libs/src/3rdparty/qtsingleapplication/qtsingleapplication"
     ]
 
-    Properties {
-        condition: qbs.targetOS.contains("linux") || qbs.targetOS.contains("unix")
-        cpp.rpaths: [ "$ORIGIN/../lib" + project.lib_suffix + "/" + project.app_target ]
-    }
+    cpp.rpaths: qbs.targetOS.contains("osx")
+                ? [ "@executable_path/.." ]
+                : [ "$ORIGIN/../lib/" + project.app_target ]
 
     files : [
         "application.cpp",
