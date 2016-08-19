@@ -18,6 +18,7 @@ Application {
     cpp.rpaths: qbs.targetOS.contains("osx")
                 ? [ "@executable_path/.." ]
                 : [ "$ORIGIN/../lib/" + project.app_target ]
+    cpp.cxxLanguageVersion: "c++11"
 
     files : [
         "application.cpp",
