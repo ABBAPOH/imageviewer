@@ -37,8 +37,8 @@ Application {
         qbs.installDir: {
             print(bundle.isBundle);
             return bundle.isBundle
-                        ? FileInfo.joinPaths(install_app_path, FileInfo.path(bundle.executablePath))
-                        : install_app_path
+                        ? FileInfo.joinPaths(project.install_app_path, FileInfo.path(bundle.executablePath))
+                        : project.install_app_path
         }
     }
     Group {
@@ -46,7 +46,7 @@ Application {
         condition: qbs.targetOS.contains("osx")
         files: "icons/Image Viewer.icns"
         qbs.install: true
-        qbs.installDir: install_data_path
+        qbs.installDir: project.install_data_path
     }
     Group {
         name: "imageviewer.rc"
